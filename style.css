@@ -1,0 +1,40 @@
+
+
+html {
+  border: 1px soli #ff0000;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  border: 1px solid #90ee90;
+  font-family: sans-serif;
+  box-sizing: border-box;
+  height: 100%;
+  text-align: center;
+  display: flex;
+}
+
+.container {
+  margin: auto;
+}
+
+.main-menu-list {
+  padding: 0;
+  text-align: center;
+}
+
+.main-menu-item {
+  list-style-type: none;
+}
+
+.main-menu-item a {
+  text-decoration: none;
+  color: #999999;
+}
+
+.complete a {
+  color: #333333;
+}
