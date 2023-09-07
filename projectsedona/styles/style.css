@@ -1,0 +1,1822 @@
+@font-face {
+  font-family: "PT Sans";
+  font-style: normal;
+  font-weight: 400;
+
+  src: url("../fonts/ptsans-400.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PT Sans";
+  font-style: normal;
+  font-weight: 700;
+
+  src: url("../fonts/ptsans-700.woff2") format("woff2");
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+html {
+  height: 100%;
+  background-color: #ffffff;
+}
+
+body {
+  display: flex;
+  width: 1200px;
+  margin: 0 auto;
+  flex-direction: column;
+  min-height: 100%;
+
+  font-family: "PT Sans", sans-serif;
+  font-size: 18px;
+  line-height: 23px;
+  font-weight: 400;
+
+  color: #000000;
+  background-color: #f2f2f2;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
+  /*outline: 2px solid rgba(87, 255, 78, 0.5);
+  outline-offset: -2px;*/ /* Рамка для подстветки элементов*/
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+/* buttons */
+
+.button {
+  font-family: "PT Sans", sans-serif;
+  font-size: 16px;
+  line-height: 21px;
+  font-weight: 700;
+
+  color: #ffffff;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 4px;
+  border: none;
+  text-align: center;
+
+  background-color: #756257;
+  cursor: pointer;
+}
+
+.button:hover {                        /* здесь и далее будем применять такую конструкцию и последовательность:   .element:hover{...}  .element:active{...}  .element:focus:not(:active){...}.  Тем самым можно добиться того, что в каждом селекторе можно будет прописывать только те стили которые соответсвуют каждому состоянию и не переопределять стили например при нажатии на элемент применяется псевдокласс active но и в этот жке момент элемент находится в фокусе.   */
+  background-color: #615048;
+}
+
+.button:active {
+  background-color: #615048;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.button:focus:not(:active) {
+  background-color: #615048;
+  outline: 3px solid #83b3d3;
+}
+
+.button-secondary {
+  background-color: #83b3d3;
+}
+
+.button-secondary:hover {
+  background-color: #68a2ca;
+}
+
+.button-secondary:active {
+  background-color: #68a2ca;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.button-secondary:focus:not(:active) {
+  background-color: #68a2ca;
+  outline: 3px solid #756257;
+}
+
+.button-large {
+  font-size: 20px;
+  line-height: 26px;
+  border-radius: 10px;
+}
+
+
+/* header */
+
+.page-header {
+  color: #000000;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.navigation {
+  display: flex;
+  padding: 0 65px 0 75px;
+  background-color: #ffffff;
+}
+
+.navigation-logo {
+  z-index: 2;  /* поднимает слой иначе оказывается сзади фоновых изображениий которые находятся в main*/
+  width: 139px;
+  height: 70px;
+  margin-bottom: -10px;
+  margin-right: 30px;
+}
+
+.navigation-list {
+  display: flex;
+  flex-wrap: wrap;
+  width: 500px;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.navigation-item {
+  display: flex;
+  align-items: center;
+}
+
+.navigation-link {
+  position: relative;
+  display: block;
+  padding: 19px 17px;
+  color: inherit;
+  text-decoration: none;
+  text-align: center;
+}
+
+.navigation-link[href]:hover { /* тем самы выделяем только активные ссылки на элементах, по которым можно перейти на другие страницы. К неактивным элементам например текущая страница эта стилизация применяться не будет, так у ссылки на текущую страницу отсутствует атрибут href */
+  color: #756257;
+}
+
+.navigation-link[href]:active {
+  color: rgba(117, 98, 87, 0.3);
+}
+
+
+.navigation-link-current::after {    /*делаем черту потекущей вкладкой меню*/
+  position: absolute;
+  content: "";
+  left: 17px;
+  right: 17px;
+  bottom: -1px;
+  z-index: 1;
+  height: 2px;
+  background-color: #756257;
+}
+
+.navigation-user {
+  justify-content: flex-end;
+  min-width: 300px;
+  max-width: 400px;
+  margin-left: auto;
+}
+
+.navigation-icon {
+  display: grid;
+  place-content: center;
+  width: 42px;
+  height: 66px;
+  padding: 22px 11px;
+  fill: #000000;
+}
+
+.navigation-icon:hover {
+  fill: #756257;
+}
+
+.navigation-icon:active {
+  color: rgba(255, 255, 255, 0.3);
+  fill: rgba(117, 98, 87, 0.3);
+}
+
+.icon-button-counter {
+  position: absolute;
+  left: 24px;
+  top: 14px;
+  min-width: 20px;
+  height: 20px;
+  padding: 3px 5px 0;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 13px;
+  color: #ffffff;
+  background-color: #7db54f;
+  border-radius: 10px;
+}
+
+.navigation-icon:active .icon-button-counter {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.navigation-button-link {
+  min-width: 160px;
+  padding: 9px 15px 8px;
+  margin-left: 20px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  line-height: 20px;
+}
+
+
+/* main */
+
+.page-main,
+.inner-main {
+  flex-grow: 1; /* для патерна "стикки футор"*/
+  background-color: #ffffff;
+}
+
+.main-logo-container {
+  min-height: 485px;
+  margin-top: -1px;
+  background-color: #4287b6;
+  background-repeat: no-repeat;
+
+  background-position:
+    50% calc(40% - 2px),
+    center bottom 0, /* почемуто не позиционирует иногда точно к низу декоративный элемент (оставляет иногда маленькую щель в один пиксель )(поэтому добавил 0 к bottom)(нужно протестить) */
+    50% 50%;
+
+  background-size:
+    auto auto,
+    100% auto,
+    cover;
+
+  background-image:
+    url("../images/background/welcome.svg"),
+    url("../images/background/divider.svg"),
+    url("../images/background/index-background.jpg");
+}
+
+/* advantages - преимущества седоны*/
+
+.advantages-title-container {
+  padding-top: 63px;
+  padding-bottom: 77px;
+  text-align: center;
+}
+
+.section-title {
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 36px;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.advantages-title {
+  margin-top: 0;
+  margin-bottom: 31px;
+}
+
+.section-subtitle {
+  font-size: 22px;
+  line-height: 26px;
+  color: #333333;
+}
+
+.advantages-subtitle {
+  margin: 0;
+  line-height: 36px;
+}
+
+/* advantages-list */
+
+.advantages-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  list-style-type: none;
+  counter-reset: counter-item-advantages; /*запускаем функцию счетчик*/
+}
+
+.advantages-item-large {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.advantages-img {
+  grid-column: span 2;
+  width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+}
+
+.advantages-item-large:nth-child(2) img {
+  order: -1;
+}
+
+.advantages-item:nth-child(n+3) .advantages-description {
+  color: #333333;
+}
+/*задаем background и color для advantages*/
+
+.advantages-item:nth-child(1) .advantages-point, /*первый и второй текстовые пункты преимущества*/
+.advantages-item:nth-child(2) .advantages-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #83b3d3;
+  color: #ffffff;
+}
+
+/*третий и пятый пункты преимуществ*//*и нечетные пунткты с изображениями имеют один цвет bg*/
+
+.advantages-item:nth-child(2n+3),
+.details-item:nth-child(odd) {
+  background-color: rgba(131, 179, 211, 0.12);
+}
+
+.advantages-item:nth-child(4) {
+  background-color: rgba(131, 179, 211, 0.2);
+}
+
+.advantages-point {
+  min-height: 384px;
+  padding-top: 98px;
+  padding-bottom: 86px;
+}
+
+.advantages-item-title {
+  margin: 0;
+  counter-increment: counter-item-advantages; /* добавляем единицу (по умолчанию функция +1) на каждом элементе .advantages-item-title */
+}
+
+.advantages-description {
+  margin: 0;
+  line-height: 21px;
+}
+
+.advantages-description::before {
+  display: block;
+  margin: 30px auto;
+  content: "— №" counter(counter-item-advantages) " —"; /*выводим нашу переменую в контенте созданного псевдоэлемента, в ковычки фкнцию ставить нельзя потому что она воспримается как строчный контент, в кавычки ставим только сторочные элементы которые не изменяются */
+}
+
+.details-list {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+}
+
+.details-item {
+  min-height: 384px;
+  padding-top: 80px;
+  padding-bottom: 79px;
+  align-items: center;
+  background-color: #ffffff;
+  list-style-type: none;
+}
+
+.details-item::before {
+  content: "";
+  display: block;
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 21px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 84px 84px;
+}
+
+.details-item-housing::before {
+  background-image: url("../images/icons/housing.svg");
+}
+
+.details-item-eating::before {
+  background-image: url("../images/icons/eating.svg");
+}
+
+.details-item-souvenir::before {
+  background-image: url("../images/icons/souvenir.svg");
+}
+
+.details-item-title {
+  margin: 0;
+  margin-bottom: 19px;
+}
+
+.details-description {
+  margin: 0;
+  line-height: 21px;
+  color: #333333;
+}
+
+/*шрифт в преимуществах Седоны*/
+.advantages-item-title,
+.details-item-title {
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 28px;
+  text-transform: uppercase;
+}
+
+
+/* search */
+
+.search {
+  display: flex;
+  flex-direction: column;
+  padding-top: 93px;
+  padding-bottom: 93px;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.search-title {
+  margin: 0 240px 29px;
+}
+
+.search-subtitle {
+  margin: 0 240px 56px;
+}
+
+.search-button {
+  margin: auto 312px 0;
+  padding-top: 15px;
+  padding-bottom: 9px;
+  line-height: 36px;
+}
+
+/* subscribe */
+
+.subscribe {
+  padding-top: 100px;
+  padding-bottom: 88px;
+  text-align: center;
+  background-color: #83b3d3;
+  background-image: url("../images/background/background-index-bottom.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.subscribe-title {
+  margin: 0 240px 29px;
+  line-height: 36px;
+}
+
+.page-main .subscribe-title,
+.page-main .subscribe-description {
+  color: #ffffff;
+}
+
+.subscribe-description {
+  margin: 0 240px 46px;
+}
+
+.subscribe-form {
+  display: flex;
+  margin: auto 200px 0;
+}
+
+.field-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 18px;
+  background-color: #f2f2f2;
+  border: 2px solid transparent;
+}
+
+.subscribe-field {
+  margin-left: auto;
+}
+
+.subscribe-field .field-input {
+  width: 600px;
+  height: 100%;
+  min-height: 60px;
+  padding-left: 22px;
+  line-height: 26px;
+  border-radius: 10px 0 0 10px;
+}
+
+.field-input:hover {
+  background-color: #e6e6e6;
+}
+
+.field-input:focus {
+  background-color: #e6e6e6;
+  outline: 2px solid #83b3d3;
+}
+
+.field-input-error {
+  border-color: #ff5757;
+  background-color: #ffffff;
+}
+
+.field-input:disabled,
+.field-input:disabled:hover,
+.field-input:disabled:active {
+  opacity: 0.3;
+  cursor: default;
+  outline: none;
+}
+
+.subscribe-button {
+  width: 200px;
+  margin-right: auto;
+  border-radius: 0 10px 10px 0;
+}
+
+/* footer */
+
+.page-footer-container {
+  display: flex;
+  padding-top: 40px;
+  padding-bottom: 30px;
+  background-color: #ffffff;
+}
+
+.social-list {
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  margin-left: 60px;
+  max-width: 140px;
+  list-style-type: none;
+}
+
+/* social-link */
+.social-link {
+  display: grid;
+  justify-content: center;  /* justify-content и align-content в grid можно заменить единым свойством place-content */
+  align-content: center;
+  width: 41px;
+  height: 40px;
+  margin-top: -2px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  border-radius: 10px;
+  fill: #83b3d3; /* Свойство fill наследуется поэтому укажем его здесь(а не в svg) что бы использовать :hover, active, focus:not(:active) не на прямую в svg а через родительскую ссылку, к томуже нам нужно еще добавить на эту ссылку outline.А если стилизовать svg отдельно, то придеться писать псевдоклассы взаимодействия еще и на него  */
+}
+
+.social-link:hover {
+  fill: #68a2ca;
+}
+
+.social-link:active {
+  opacity: 0.3;
+  fill: #68a2ca;
+}
+
+.social-link:focus:not(:active) {
+  outline: 3px solid #83b3d3;
+  outline-offset: -3px;
+  fill: #83b3d3;
+}
+
+/* footer-phone */
+.footer-phone {
+  margin-top: -15px;
+  margin-left: auto;
+  margin-right: 31px;
+  margin-bottom: 0;
+  width: 720px;
+  padding: 15px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 40px;
+  line-height: 40px;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.footer-phone:hover {
+  color: #756257;
+}
+
+.footer-phone:active {
+  opacity: 0.3;
+}
+
+.footer-phone:focus:not(:active) {
+  color: #756257;
+  outline: 3px solid #83b3d3;
+}
+
+.footer-developer-link {
+  height: min-content;
+  margin-top: -15px;
+  margin-right: 50px;
+  padding: 16px 22px;
+  border-radius: 10px;
+  fill: #000000;
+}
+
+.footer-developer-link:hover {
+  fill: #756257;
+}
+
+.footer-developer-link:active {
+  opacity: 0.3;
+  fill: #756257;
+}
+
+.footer-developer-link:focus:not(:active) {
+  outline: 3px solid #83b3d3;
+  fill: #756257;
+}
+
+/*Стилицация  страницы каталога гостиниц*/
+/*поему то шапка каталога сдвигается на 5ox в лево*/
+.navigation-inner {
+  padding: 0 70px;
+}
+
+.inner-header-container {
+  min-height: 408px;
+  padding-left: 72px;
+  padding-right: 72px;
+  padding-top: 42px;
+  padding-bottom: 80px;
+  background-color: #3d78a0;
+  background-image: url("../images/background/catalog-background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #ffffff;
+}
+
+.inner-main-title {
+  margin-top: 0;
+  margin-bottom: -15px;
+  font-weight: 700;
+  font-size: 60px;
+  line-height: 78px;
+}
+
+/*Хлебные крошки*/
+
+.breadcrumbs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  padding: 0;
+  margin: 0;
+  margin-left: -7px;
+  font-size: 16px;
+  line-height: 21px;
+  margin-bottom: 40px;
+  list-style-type: none;
+}
+
+.breadcrumbs-item:first-child {
+  margin-right: -10px;
+}
+
+.breadcrumbs-item:not(:first-child) {
+  position: relative;
+  margin-left: 20px;
+  margin-right: -10px;
+}
+
+.breadcrumbs-item:not(:first-child)::before {
+  position: absolute;
+  top: 0;
+  left: -7px;
+  content: "";
+  width: 5px;
+  height: 100%;
+  background-image: url("../images/icons/breadcrumbs-arrow.svg");
+  background-repeat: no-repeat;
+  background-size: 5px 8px;
+  background-position: center 55%;
+}
+
+.breadcrumbs-link {
+  display: block;
+  height: 100%;
+  padding: 0 5px;
+  text-decoration: none;
+  color: inherit;
+  border: 3px solid transparent;
+  border-radius: 4px;
+}
+
+.home-link {
+  width: 28px;
+  height: 27px;
+  background-image: url("../images/icons/home-breadcrumbs.svg");
+  background-repeat: no-repeat;
+  background-position: right 50% top 2px;
+  background-size: 12px 12px;
+}
+
+.breadcrumbs-link:hover {
+  opacity: 0.6;
+}
+
+.breadcrumbs-link:active {
+  opacity: 0.3;
+}
+
+.breadcrumbs-link:focus:not(:active) {
+  border: 3px solid #83b3d3;
+  border-radius: 4px;
+  outline: 0; /* при переключении фокуса клавишей tab вклюется псевдоклас focus-vuisible происходит не такая стилизация   */
+}
+
+
+/*Фильтр каталога*/
+
+.catalog-filter-form {
+  display: grid;
+  grid-template-columns: 197px 197px 1fr 221px;
+  gap: 20px;
+}
+
+.catalog-filter-title {
+  margin-left: -3px;
+  margin-top: 0;
+  margin-bottom: 30px;
+  padding-top: 0;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.catalog-filter-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.catalog-filter-item:not(:last-child) {
+  margin-bottom: 13px;
+}
+
+.filter-fieldset {
+  width: 200px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/*  checkbox  and radio */
+.control {
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+}
+
+.control-label {
+  display: grid;
+  grid-template-columns: 20px 1fr; /* теперь при переносе текста на новую строку он будет находить ся в второй ячейке и будет сохраняться отступ */
+  gap: 19px;
+}
+
+
+.control-label::before,
+.control-label::after {
+  grid-column: 1 / 2; /* тфким образом заставим элементы наслоиться друг на друга */
+  grid-row: 1 / 2;
+  content: "";
+  width: 20px;
+  height: 20px;
+}
+
+.control-label::before {
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+
+.control-label::after {
+  display: none;
+  background-image: url("../images/icons/tick.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+.control-input[type="radio"] + .control-label::after {
+  width: 20px;
+  height: 20px;
+  border: 5px solid transparent; /* такой способ нарисовать точку меньшего диаметра задать прозрачную границу и орезат бакгроунд по content-box */
+  background-clip: content-box;
+  background-color: #595959;
+  border-radius: 50%;
+}
+
+/* checkbox */
+
+.control:hover .control-input[type="checkbox"] + .control-label::before {
+  background-color: rgba(255, 255, 255, 0.6);  /* если применить простое opacity то оно повлияет на z-index и при наведении псевдоэлемент before будет располагаться над псевдоэлементом after и если галка поставлена она будет исчезат при наведении. Еще можно использовать в таком случае z-index: 1; для .control-label::after */
+}
+
+.control-input[type="checkbox"]:active + .control-label::before {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+
+.control-input:focus + .control-label::before {
+  outline: 3px solid #83b3d3;
+}
+
+.control-input[type="checkbox"]:checked + .control-label::after {
+  display: block;
+}
+
+/* radio */
+
+.control-input[type="radio"] + .control-label::before {
+  content: "";
+  border-radius: 50%;
+}
+
+.control-input[type="radio"]:checked + .control-label::after {
+  display: block;
+}
+
+/* checkbox and radio disabled*/
+
+.control-input:disabled + .control-label {
+  opacity: 0.3;
+}
+
+.control-input:disabled + .control-label::before {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* range */
+
+.filter-fieldset-price {
+  justify-self: end;
+  width: 100%;
+  max-width: 287px;
+}
+
+.filter-fieldset-price .catalog-filter-title {
+  margin-bottom: 35px;
+}
+
+.range-fields {
+  display: flex;
+  margin-bottom: 28px;
+}
+
+.range-field {
+  display: flex;
+  flex-grow: 1;
+  border: none;
+  position: relative;
+}
+
+.range-title {
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  bottom: 12px;
+  opacity: 0.3;
+}
+
+.range-input {
+  font-family: "PT Sans", sans-serif;
+  display: block;
+  height: 48px;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 11px;
+  padding-top: 14px;
+  padding-left: 17px;
+  padding-right: 14px;
+  border: 2px solid #ffffff;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  font-size: 18px;
+  line-height: 23px;
+  color: #ffffff;
+  background-color: transparent;
+  appearance: none;
+  cursor: default;
+}
+
+.range-field:last-child .range-input {
+  border-left: none;
+  border-radius: 0;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.range-input:focus {
+  outline: none;
+}
+
+.range-input:hover {
+  opacity: 0.6;
+}
+
+.range-input:active {
+  background-color: #756257;
+}
+
+.range-input:disabled,
+.range-input:disabled:hover {
+  opacity: 0.3;
+}
+
+.range-input:disabled:active {
+  background-color: transparent;
+}
+
+.range-input:focus:not(:active) {
+  outline: 3px solid #83b3d3;
+  box-shadow: inset 0 0 0 3px #83b3d3;
+  opacity: 1;
+  border-left: 2px solid #ffffff;
+}
+
+/* Код ниже прячет стрелки управления в браузерах, основанных на webkit (Opera для проверки нет): */
+.range-input::-webkit-outer-spin-button,
+.range-input::-webkit-inner-spin-button {
+  appearance: none;
+}
+
+/* Для Firefox попроще: */
+.range-input[type="number"] {
+  appearance: textfield;
+}
+
+/*  range-slider  */
+
+.range-slider {
+  display: flex;
+  flex-direction: column;  /*  для растяжения */
+  height: 4px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.slider-bar {
+  position: relative;
+  height: 4px;
+  background-color: #ffffff;
+}
+
+.range-toggle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.range-toggle:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.range-toggle:active {
+  outline: 2px solid #83b3d3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.range-toggle:focus:not(:active) {
+  outline: 3px solid #83b3d3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.toggle-min {
+  top: -8px;
+  left: 0;
+}
+
+.toggle-max {
+  top: -8px;
+  right: -0;
+}
+
+
+/* disabled */
+
+.filter-fieldset-price-disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* range-slider end*/
+
+.filter-buttons {
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  width: 160px;
+  padding-top: 60px;
+}
+
+.filter-submit {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.filter-submit:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.filter-submit:focus:not(:active) {  /* неоходимо поддерживать специфичность селекторов на одном уровне, если уже и используем конструкцию :focus:not(:active) то так, и надо делать везде, иначе невозможно будет переопределить стили за счет того, что селектор находиться ниже переопределяемого  */
+  outline: 3px solid #ffffff;
+}
+
+.button-reset {
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2px 12px;
+  font-family: "PT sans", sans-serif;
+  font-size: 18px;
+  line-height: 23px;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  cursor: pointer;
+}
+
+.button-reset:hover {
+  opacity: 0.6;
+}
+
+.button-reset:active {
+  opacity: 0.3;
+}
+
+.button-reset:focus:not(:active) {
+  outline: 3px solid #83b3d3;
+  border-radius: 4px;
+}
+
+.button-reset:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* catalog */
+
+.catalog {
+  padding: 0 72px;
+}
+/*сортировка и отображение*/
+
+.catalog-sort {
+  display: grid;
+  grid-template-columns: 1fr 287px max-content;
+  align-items: center;
+  gap: 81px;
+  padding-top: 43px;
+  padding-bottom: 53px;
+}
+
+.sorting-type-text {
+  display: flex;
+  min-width: 338px;
+  margin: 0;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 39px;
+  text-transform: uppercase;
+}
+
+/* select-view */
+/* select-pagination */
+
+.select-view,
+.select-pagination {  /* ширина второго селекта задается далее в разделе pagination-select */
+  position: relative; /* что бы в дальнейшем исключить select-view-list потока задав ему потом абсолютную позицию относительно родителя */
+  z-index: 2;   /* передаст потомкам, и при подводе курсора фотографии не будут проступать через выдающий список */
+}
+
+.select-button {  /*ширина элемента .select-view-button  задается размеров колонки грид-коннтейнера .catalog-sort */
+  display: flex;   /* также убирается черный тругольник у summary так как изначально summary имеет display: list-item и поэтому имеет маркер в виде треугольника*/
+  align-items: center;
+  height: 48px;
+  padding-left: 19px;
+  padding-right: 19px;
+  outline: 2px solid #e6e6e6;
+  outline-offset: -2px;  /* outline всегда делает обводку снаружи элемента. И если мы хотим заменить border на outline c теми же размерами(в селекте это актуально нам нужно перекрыть outline фокуса браузера) необходимо сужать outline к центру элемента свойством outline-ofset с отрицательным значением равным толщине линии*/
+  border-radius: 4px;
+  color: #333333;
+  user-select: none;  /* не позволяет выделять область текста так как это мешает пользоваться  */
+}
+
+.select-button:hover {
+  outline: 2px solid #83b3d3;
+  outline-offset: -2px;
+}
+
+.select-button:active {
+  outline: 2px solid #e6e6e6;
+  outline-offset: -2px;
+  color: rgb(51, 51, 51, 0.3);
+}
+
+.select-button:focus:not(:active) {
+  outline: 2px solid #83b3d3;
+  outline-offset: -2px;
+}
+
+.select-button::after { /* создаем новую стрелку */
+  content: "";
+  width: 12px;
+  height: 7px;
+  margin-left: auto;
+  background-image: url("../images/icons/chevron-down.svg");
+}
+
+.select-view[open] .select-button::after,
+.select-pagination[open] .select-button::after { /* при клике на summary открывается details и у него появляется атрибут open, и мы используем это что бы развернуть стрелку вверх */
+  transform: rotate(180deg);
+}
+
+.select-list {
+  position: absolute;
+  top: 100%;
+  left: 2px;
+  right: 2px;
+  margin: 0;
+  margin-top: 1px;
+  padding: 10px 0;
+  border-radius: 4px;
+  background-color: #ffffff;
+  list-style-type: none;
+  box-shadow: 0 5px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.select-link {
+  display: block;
+  padding: 5px 19px;
+  background-color: #f2f2f2;
+  color: #333333;
+  text-decoration: none;
+}
+
+.select-link-current {
+  background-color: #ffffff;
+  color: rgb(51, 51, 51, 0.3);
+}
+
+.select-link[href]:hover {
+  background-color: #e6e6e6;
+}
+
+.select-link[href]:active {
+  color: rgb(51, 51, 51, 0.3);
+  background-color: #ffffff;
+}
+
+.select-link[href]:focus:not(:active) {
+  background-color: #e6e6e6;
+}
+
+/* card-view-list */
+
+.card-view-list {
+  max-width: 170px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: -4px; /* еще одинподход: родительский контейнер с минусовым маржином по всему периметру, а внутренние элементы имет по кругу плюсовой марджин того же размера, то есть около краев контейнера маржины компенсируются, но между собой элементы имееют отступ в размере двойного марджина (чем то похоже на gap в grid) и можно не обнулять маржин у последенего элеменнта в ряду как к примеру .card-view-item:last-child {margin-right: 0;}*/
+  padding: 0;
+  list-style-type: none;
+}
+
+.card-view-item {
+  margin: 4px;
+}
+
+.button-view {
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-repeat: no-repeat;
+  background-size: 16px 14px;
+  background-position: center;
+  border: 2px solid #e6e6e6;
+  border-radius: 4px;
+}
+
+.button-view-current {
+  border: 2px solid #000000;
+}
+
+
+.button-view[href]:hover,
+.button-view[href]:focus {
+  border: 2px solid #83b3d3;
+}
+
+.button-view-tile {
+  background-image: url("../images/icons/mode-tile.svg");
+}
+
+.button-view-slideshow {
+  background-image: url("../images/icons/mode-slideshow.svg");
+}
+
+.button-view-list {
+  background-image: url("../images/icons/mode-list.svg");
+}
+
+/* product-list */
+
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(3, 340px);
+  gap: 10px 18px;
+  margin-top: 0;
+  margin-bottom: 34px;
+  padding: 0;
+}
+
+.product-card {
+  display: grid;
+  gap: 16px 25px;
+  grid-template-columns: 133px 143px;
+  padding: 20px;
+  list-style-type: none;
+}
+
+.product-card-link {
+  position: relative;
+  grid-column: 1 / -1;
+  display: grid;
+  text-decoration: none;
+}
+
+.product-card-link::before { /* "довольно хитрое решение с наложением псевдоэлемента в карточке товара: он располагается поверх текста и картинки, создавая таким образом кликабельную область."  Изучите как это сделано ради интереса, но помните: абсолютно нормально заключить в одну ссылку оба элемента сразу.*/
+  position: absolute;
+  top: -242px;
+  left: -20px;
+  right: -20px;
+  z-index: 1;  /* поднимаем над изображением*/
+  content: "";
+  height: calc(100% + 242px);
+}
+
+.product-card-image {
+  grid-column: 1 / -1;
+  order: -1;
+  display: block;  /*тег img по умолчаню идет display: inline; и поя вляется отсуп снизу наверно запас для начертания букв.Поэтому меняем на display: block;  и отступ исчезает */
+}
+
+.product-card-link:hover + .product-card-image {  /* ньюанс в том, что мы наводим на псевдоэлемент, но вот такая запись у меня не сработала .product-card-link::before:hover, а сработала вот такая запись .product-card-link:hover */
+  opacity: 0.6;                                     /* так здесь нет вложености нужно использовать "соседние селекиторы" Для управления стилем соседних элементов используется символ плюса (+), который устанавливается между двумя селекторами E и F. Пробелы вокруг плюса не обязательны. Стиль при такой записи применяется к элементу F, но только в том случае, если он является соседним для элемента E и следует сразу после него.  */
+}
+
+.product-card-link:focus { /* убираем рамку с кликабельного псевдоэлемента при фокусе */
+  outline: none;
+}
+
+.product-card-link:focus + .product-card-image {
+  outline: 3px solid #83b3d3;
+}
+
+.product-card-link:active + .product-card-image {
+  opacity: 0.3;
+  outline: none;
+}
+
+.product-card-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 31px;
+  color: #000000;
+}
+
+.product-card-type-house,
+.product-card-price {
+  color: #333333;
+}
+
+.product-card-button {
+  padding-top: 9px;
+  padding-bottom: 7px;
+}
+
+.product-card-button.enabled {
+  background-color: #7db54f;
+}
+
+.product-card-button.enabled:hover {
+  background-color: #6c9e42;
+}
+
+.product-card-button.enabled:active {
+  background-color: #6c9e42;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.product-card-button.enabled:focus:not(:active) {
+  background-color: #6c9e42;
+  outline: 3px solid #756257;
+}
+
+/* stars */
+
+.rating-container {
+  margin: 0;
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 4px;
+}
+
+.rating-stars { /* добавили в разметку к каждой карточке пустой контейнер с таким классом */
+  background-image: url("../images/icons/star.svg"); /* добавим в фон изображение одной звезды (размер шрина 18px, высота: 17px ) */
+  background-size: 25px 17px;  /* захватываем в нашу область бэкграунда кусок пустого пространства справа по горизонтали который равен 7px(растояние между звездами на макете) так как ширина звезды равна 18 то общая ширина с отступом 18+7=25 */
+  background-position: -3px 50%; /* выставляем звезду к левому краю по горизотали(так как мы взяли ширину бекграуда больше чем ширина звезды, то звезда автоматически поместится по центру оставив по три с полоаиной пикселя пустого пространства по обеим сторонам. Поэтому сместим ее влево на половину промежутка (между звездами на макете) но число пикселей должно быть целым, возьмем 3 px. И выравниваем по середине по вертикали */
+  background-repeat: repeat-x; /* теперь повторяем нашу звезду (вместе с пустым промежутком) по горизонтали */
+}
+
+.star-one { /* количество звезд можно регулировать шириной контейнера с фоном из звезд присвоим следущим классам соответсвую ширину */
+  width: 18px; /* влезет только одна звезда*/
+}
+
+.star-two {
+  width: 43px; /* 18+7+18  - звезда, промежуток, звезда. Итого: две звезды */
+}
+
+.star-three {
+  width: 68px; /* 43 плюс еще 25 (промежуток и звезда) */
+}
+
+.star-four { /* 68 плюс еще 25 (промежуток и звезда) */
+  width: 93px;
+}
+
+.star-five { /* 93 плюс еще 25 (промежуток и звезда) */
+  width: 118px;
+}
+
+.product-rating {
+  display: block;
+  width: 160px;
+  padding-top: 9px;
+  padding-bottom: 7px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 21px;
+  text-transform: uppercase;
+  background-color: #f2f2f2;
+  border-radius: 4px;
+  text-align: center;
+  color: #333333;
+}
+
+/* show-more-button-container */
+
+.show-more-button-container {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+.button-show-more {
+  display: block;
+  margin: 0 auto;
+  padding-top: 17px;
+  padding-bottom: 17px;
+  width: 620px;
+  font-size: 20px;
+  line-height: 26px;
+  border-radius: 4px;
+}
+
+/* pagination */
+
+.pagination-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pagination-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -4px;   /* вариант размещения элементов внутри контейнера - использовать отрицательные маржины на контейнере, вместо обнуления отступа у последнего элемента как раньше .pagination-list{margin: 0;} , .pagination-item {margin-right: 8px;} , .pagination-item:last-child {margin-right: 0;} . (плюч к этому еще добавлдены вертикальные  отрицательные отсупы которые потом будут поглащать отступы элементов. Но справа поставим положительный отступ что бы элемненты не пирилипали к элементам справа  */
+  margin-right: 10px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 26px;
+  text-transform: uppercase;
+  list-style: none;
+}
+
+.pagination-item {
+  margin: 4px 4px;  /* располовиниваем горизонтальный и вертикальный отсутп между элементами */
+}
+
+.pagination-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  min-width: 55px;
+  height: 55px;
+  color: #ffffff;
+  background-color: #83b3d3;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.pagination-link[href]:hover {
+  background-color: #68a2ca;
+}
+
+.pagination-link[href]:active {
+  background-color: #68a2ca;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.pagination-link[href]:focus:not(:active) {  /* когда фокус и фокус визибле совпадают то то их стили накладываются и стилизация выглядит не так как зудумывалось */
+  background-color: #68a2ca;
+  outline: 3px solid #756257;
+  outline-offset: 0;  /* важно!!!!!!!! при выборе через таб на клавиатуре появляется кольцо фокусировки стилизованое от браузера оно изменяет outline-offset вроде... И в зависимости от того выбран ли элемент мышкой или клавиатурой получается немго отличия в стилизации. непонятно. Для примера можно добавить .pagination-link:focus-visible {outline-offset: 5px;} */
+}
+
+.pagination-current-link {
+  color: #000000;
+  background-color: #f2f2f2;
+}
+
+/* pagination-select  */
+
+.card-view-quantity {
+  display: flex;
+  align-items: center;
+  min-width: 386px;
+}
+
+.pagination-selest-label {
+  margin: 0;
+  margin-right: 51px;
+}
+
+.select-quantity-card {
+  color: #333333;
+}
+
+.select-pagination .select-button {
+  width: 160px;
+}
+
+
+/* секция подписки на  странице каталога */
+
+
+.inner-subscribe {
+  padding-top: 73px;
+  padding-bottom: 142px;
+  text-align: center;
+}
+
+.inner-subscribe .subscribe-title {
+  margin-bottom: 46px;
+}
+
+
+.inner-subscribe-description {
+  width: 720px;
+  margin: 0 auto 46px;
+}
+
+/*  модальное окно */
+
+.modal {
+  position: fixed;
+  top: 0;  /* без top: 0; left: 0; окно будет смещаться из центра прои зуме */
+  left: 0;
+  z-index: 2;
+  display: none;
+  width: 100%;
+  height: 100%;
+  place-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-opened {
+  display: grid;
+}
+
+.modal-container {
+  display: grid;
+  grid-template-columns: 1fr min-content;
+  row-gap: 54px;
+  padding: 70px;
+  padding-top: 54px;
+  width: 715px;
+  background: #ffffff;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  border-radius: 30px;
+}
+
+.modal-close-button {
+  padding: 0;
+  width: 53px;
+  height: 53px;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 50%;
+}
+
+.modal-close-button::after {
+  display: block;  /*  все созданные псевдоэлементы по умолчанию display: inline;  для задания размеров необходимо применить display: block, flex, grid...  */
+  content: "";
+  width: 53px;
+  height: 53px;
+  background-image: url("../images/icons/modal-close.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.modal-close-button:hover,
+.modal-close-button:active {
+  background-color: #e6e6e6;
+}
+
+.modal-close-button:active::after {
+  opacity: 0.3;
+}
+
+.modal-close-button:focus:not(:active) {
+  background-color: #e6e6e6;
+  outline: 3px solid #83b3d3;
+  outline-offset: 0; /* видимо, как и выше добавлено чтобы focus-visible не переопределял  значение  outline-ofset*/
+}
+
+.modal-title {
+  align-self: center;
+  margin: 0;
+  padding-top: 4px;
+  line-height: 40px;
+}
+
+.modal-content {   /* по сути форме присвоен так же этот класс видимо что бы подчеркнуть структуру   */
+  grid-column: 1 / -1;
+}
+
+/*   Search Form     */
+
+.modal-search-form {
+  display: grid;
+  grid-template-rows: repeat(3, 50px) 60px;
+  grid-template-columns: 50% 1fr;   /*   это делается что бы уместить в третью строку 2 поля   */
+  row-gap: 40px;
+}
+
+.search-form-date {
+  grid-column: 1 / -1;
+}
+
+.modal-field {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  column-gap: 15px;
+}
+
+.modal-field-title {
+  align-self: center;  /* будет далее действовать во всех grid    */
+  padding-top: 2px;
+  padding-left: 2px;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 40px;
+  cursor: pointer;
+}
+
+.modal-search-form .field-input {
+  padding-left: 21px;
+  padding-right: 20px;
+  height: 50px;
+  line-height: 40px;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+
+.search-form-date .field-input {
+  background-image: url("../images/icons/date.svg");
+  background-repeat: no-repeat;
+  background-position: right 15px top 55%;
+}
+
+.search-form-input:not(:placeholder-shown):active {
+  outline: 2px solid #333333;
+  background-color: #ffffff;
+}
+
+.search-form-input:disabled:hover,
+.search-form-input:disabled:not(:placeholder-shown):active {
+  outline: none;
+  background-color: rgb(242, 242, 242);
+}
+
+.modal-field-message {
+  grid-column: 2 / 3;
+  margin-top: -7px;
+  margin-left: 1px;
+  font-size: 16px;
+  line-height: 40px;
+  color: #333333;
+}
+
+.modal-field-message-error {
+  color: #ff5757;
+}
+
+
+.modal-number {
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+}
+
+.number-button {
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  width: 50px;
+  height: 50px;
+  border: none;
+  background-color: transparent;
+}
+
+
+.number-button-minus {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.number-button-plus {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+}
+
+.number-input {
+  grid-column: 1 / -1;
+  grid-row: 1 / 2;
+  width: 133px;
+  padding: 0 50px;
+  text-align: center;
+  appearance: textfield;  /* Для Firefox попроще: Код прячет стрелки управления в браузерах */
+}
+
+/* Код ниже прячет стрелки управления в браузерах, основанных на webkit (Opera для проверки нет): */
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+  appearance: none;
+}
+
+.number-button::after {
+  content: "";
+  width: 25px;
+  height: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.3;
+}
+
+.number-button-minus::after {
+  background-image: url("../images/icons/minus-number.svg");
+}
+
+.number-button-plus::after {
+  background-image: url("../images/icons/plus-number.svg");
+}
+
+.number-button:hover::after {
+  opacity: 1;
+}
+
+.number-button:active::after {
+  opacity: 0.2;
+}
+
+/* убираем с кнопок стандартную рамку при фокусе от браузера */
+.number-button:focus {
+  outline: none;
+}
+
+/* прописываем свой фокус */
+.number-button:focus:not(:active)::after {
+  border: 3px solid #83b3d3;
+  border-radius: 4px;
+  opacity: 1;
+}
+
+.number-button:disabled,
+.number-button:disabled:hover::after,
+.number-button:disabled:active::after {
+  border: none;
+  opacity: 0.3;
+}
+
+.modal-form-info {
+  position: relative;
+  display: grid;
+  grid-template-columns: min-content min-content;
+  justify-content: end; /* выравнивает "дети:" по правому краю   */
+  align-items: center;
+}
+
+.field-info-icon {
+  position: relative;
+  display: block;
+  width: 25px;
+  height: 25px;
+  margin-top: 5px; /* подгонка по местоположению */
+  margin-right: 2px;
+  margin-left: 10px;
+  background-color: #83b3d3;
+  border-radius: 50%;
+  background-image: url("../images/icons/i-info.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
+
+.field-info-icon:hover {
+  background-color: #68a2ca;
+}
+
+/* всплыващая подсказка */
+.field-info-text {
+  position: absolute; /* позиционирование ее отностельно родителя и выведение из потока */
+  z-index: 1; /* иначе перекрывается аналогичным родителем */
+  top: 40px;
+  left: calc(-128px + 50%);
+  display: none;
+  width: 256px;
+  padding: 20px 15px 23px 24px;
+  font-size: 16px;
+  line-height: 20px;
+  background-color: #333333;
+  border-radius: 10px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.field-info-icon:hover .field-info-text {
+  display: block;
+}
+
+.field-info-text::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: calc(50% - 10px);
+  width: 19px;
+  height: 9px;
+  background-image: url("../images/icons/triangle.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.modal-button-submit {
+  grid-column: 1  / -1;
+  margin-top: 1px;
+  margin-left: 2px;
+  margin-right: -2px;
+  line-height: 40px;
+}
+
+.modal-button-submit:disabled,
+.modal-button-submit:disabled:hover,
+.modal-button-submit:disabled:active {
+  opacity: 0.3;
+  background-color: #83b3d3;
+  color: #ffffff;
+  cursor: default;
+}
