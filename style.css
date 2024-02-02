@@ -38,3 +38,7 @@ body {
 .complete a {
   color: #333333;
 }
+
+.in-work a {
+  color: #666666;
+}
