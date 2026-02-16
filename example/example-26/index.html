@@ -2,12 +2,260 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Сноски с CSS-счетчиком</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мега-тренажер: Равнобедренный треугольник</title>
+    <style>
+        :root {
+            --primary: #2c3e50; --accent: #3498db; --success: #27ae60;
+            --danger: #e74c3c; --bisector: #9b59b6; --height: #e67e22;
+            --median: #2ecc71; --gold: #f1c40f; --bg: #f0f2f5;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .main-app { background: white; width: 950px; height: 650px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; overflow: hidden; position: relative; }
+        
+        /* Левая панель: Визуализация */
+        .visual-panel { flex: 1; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 2px solid #f0f0f0; position: relative; }
+        svg { width: 90%; height: 400px; overflow: visible; }
+        .tri-base { fill: rgba(52, 152, 219, 0.05); stroke: var(--primary); stroke-width: 3; transition: 0.3s; }
+        .marker { stroke-width: 3; fill: none; opacity: 0; transition: 0.3s; }
+        .label { font-weight: bold; font-size: 16px; }
+
+        /* Правая панель: Контент */
+        .content-panel { width: 400px; padding: 40px; display: flex; flex-direction: column; background: #fafbfc; }
+        .progress-bar { height: 6px; background: #eee; border-radius: 3px; margin-bottom: 20px; position: relative; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.3s; }
+        
+        h2 { margin: 0 0 15px 0; color: var(--primary); font-size: 22px; }
+        .step-desc { font-size: 15px; color: #555; line-height: 1.5; margin-bottom: 20px; min-height: 80px; }
+        
+        .interactive-controls { margin-bottom: 20px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .opt-btn { padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; transition: 0.2s; text-align: left; font-size: 14px; }
+        .opt-btn:hover { background: #f0f7ff; border-color: var(--accent); }
+        .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        .nav-btns { margin-top: auto; display: flex; gap: 10px; }
+        .nav-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-prev { background: #eee; color: #777; }
+
+        /* Финальный босс */
+        #boss-layer { position: absolute; inset: 0; background: white; z-index: 100; display: none; flex-direction: column; align-items: center; padding: 40px; text-align: center; }
+        .boss-svg-box { width: 100%; height: 300px; background: #f9f9f9; border-radius: 15px; margin: 20px 0; border: 3px solid transparent; }
+        .leaderboard { width: 100%; max-width: 400px; border-collapse: collapse; margin-top: 20px; }
+        .leaderboard th { border-bottom: 2px solid #eee; padding: 10px; font-size: 12px; color: #999; }
+        .leaderboard td { padding: 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; }
+    </style>
 </head>
 <body>
 
+<div class="main-app">
+    <!-- СЛОЙ ОБУЧЕНИЯ -->
+    <div class="visual-panel" id="learn-visual">
+        <svg viewBox="0 0 400 400" id="mainSvg">
+            <path id="triPath" class="tri-base" d="M200,50 L80,320 L320,320 Z" />
+            <!-- Маркеры сторон -->
+            <line id="mSideL" class="marker" x1="135" y1="180" x2="145" y2="190" stroke="var(--danger)" />
+            <line id="mSideR" class="marker" x1="255" y1="190" x2="265" y2="180" stroke="var(--danger)" />
+            <!-- Маркеры углов -->
+            <path id="mAngleA" class="marker" d="M105,320 A25,25 0 0 0 95,290" stroke="var(--height)" />
+            <path id="mAngleC" class="marker" d="M305,290 A25,25 0 0 0 295,320" stroke="var(--height)" />
+            <!-- Центральная линия -->
+            <line id="mCenter" class="marker" x1="200" y1="50" x2="200" y2="320" stroke="#7f8c8d" stroke-dasharray="5,5" />
+            <polyline id="mSquare" class="marker" points="185,320 185,305 200,305" stroke="var(--height)" />
+            <!-- Подписи -->
+            <text x="195" y="40" class="label">B</text>
+            <text x="60" y="340" class="label">A</text>
+            <text x="325" y="340" class="label">C</text>
+        </svg>
+    </div>
+
+    <div class="content-panel" id="learn-content">
+        <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        <h2 id="stepTitle">Загрузка...</h2>
+        <p id="stepDesc" class="step-desc"></p>
+        
+        <div class="interactive-controls" id="stepInput"></div>
+
+        <div class="nav-btns">
+            <button class="nav-btn btn-prev" id="btnBack" onclick="moveStep(-1)">Назад</button>
+            <button class="nav-btn btn-next" id="btnNext" onclick="moveStep(1)">Далее</button>
+        </div>
+    </div>
+
+    <!-- СЛОЙ ФИНАЛЬНОГО БОССА -->
+    <div id="boss-layer">
+        <h1 id="bossStatus">ФИНАЛЬНЫЙ БОСС: СПРИНТ</h1>
+        <div style="display: flex; gap: 50px; font-size: 20px; font-weight: bold;">
+            <span id="bossScore">Счет: 0</span>
+            <span id="bossTimer" style="color:var(--danger)">Время: 30</span>
+        </div>
+        
+        <div class="boss-svg-box" id="bossBox">
+            <svg id="bossSvg" viewBox="0 0 400 300"></svg>
+        </div>
+
+        <div id="bossControls" style="display:none; width: 100%; max-width: 500px; gap: 10px; grid-template-columns: 1fr 1fr 1fr; display: grid;">
+            <button class="nav-btn" style="background:var(--bisector); color:white" onclick="checkBoss('bis')">БИССЕКТРИСА</button>
+            <button class="nav-btn" style="background:var(--height); color:white" onclick="checkBoss('hei')">ВЫСОТА</button>
+            <button class="nav-btn" style="background:var(--median); color:white" onclick="checkBoss('med')">МЕДИАНА</button>
+        </div>
+
+        <div id="bossStartUI">
+            <p>30 секунд на определение линий. За ошибку -3 секунды!</p>
+            <button class="nav-btn btn-next" style="padding: 20px 60px;" onclick="startBoss()">В БОЙ!</button>
+            <table class="leaderboard">
+                <thead><tr><th>Место</th><th>Очки</th><th>Дата</th></tr></thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- ДАННЫЕ ШАГОВ (20 ШАГОВ) ---
+    const steps = [
+        { t: "Основы", d: "Треугольник равнобедренный, если AB = BC. Нажми на боковую сторону, чтобы подсветить её.", q: "Кликни по кнопке ниже:", opts: ["Подсветить стороны"], act: () => show(['mSideL', 'mSideR']) },
+        { t: "Углы", d: "Углы при основании (A и C) всегда равны. Если ∠A = 40°, чему равен ∠C?", opts: ["40°", "80°", "100°"], corr: "40°", act: () => show(['mAngleA', 'mAngleC']) },
+        { t: "Вершина", d: "Угол ∠B называется углом при вершине. Сумма всех углов всегда 180°.", q: "Если ∠A=50° и ∠C=50°, чему равен ∠B?", opts: ["100°", "80°", "90°"], corr: "80°" },
+        { t: "Медиана", d: "Медиана делит основание AC пополам. Точка M — середина.", q: "Если AC = 12 см, чему равна длина AM?", opts: ["12 см", "6 см", "24 см"], corr: "6 см", act: () => show(['mCenter']) },
+        { t: "Высота", d: "Высота всегда перпендикулярна основанию (угол 90°).", q: "Какой угол образует высота с основанием?", opts: ["45°", "90°", "180°"], corr: "90°", act: () => show(['mCenter', 'mSquare']) },
+        { t: "Биссектриса", d: "Биссектриса делит угол при вершине B пополам.", q: "∠B = 60°. Чему равны углы после проведения биссектрисы?", opts: ["30° и 30°", "60° и 60°", "20° и 40°"], corr: "30° и 30°" },
+        { t: "Свойство '3 в 1'", d: "Главный секрет: в равнобедренном треугольнике высота, медиана и биссектриса, проведенные к основанию — это ОДНА линия.", opts: ["Я запомнил!"], act: () => show(['mCenter', 'mSquare', 'mAngleA', 'mAngleC']) },
+        { t: "Периметр", d: "P = AB + BC + AC. Стороны AB=BC=10 см, основание 5 см.", q: "Найди периметр:", opts: ["20 см", "25 см", "15 см"], corr: "25 см" },
+        { t: "Боковая сторона", d: "Периметр 20 см, основание 6 см. Чему равна боковая сторона?", q: "Считаем: (20 - 6) / 2 = ?", opts: ["7 см", "14 см", "10 см"], corr: "7 см" },
+        { t: "Признак равенства", d: "Если два угла треугольника равны (например, 70° и 70°), будет ли он равнобедренным?", opts: ["Да", "Нет"], corr: "Да" },
+        { t: "Тупой угол", d: "Может ли угол ПРИ ОСНОВАНИИ быть 100°?", opts: ["Да", "Нет (сумма будет > 180°)", "Только в Африке"], corr: "Нет (сумма будет > 180°)" },
+        { t: "Прямоугольный и равнобедренный", d: "В таком треугольнике угол при вершине 90°.", q: "Чему равны его углы при основании?", opts: ["45° и 45°", "30° и 60°", "90° и 90°"], corr: "45° и 45°" },
+        { t: "Внешний угол", d: "Внешний угол при основании равен 120°. Найди внутренний угол при основании.", opts: ["60°", "120°", "180°"], corr: "60°" },
+        { t: "Остроугольный", d: "Если угол при вершине 20°, какие углы при основании?", opts: ["80° и 80°", "160° и 160°", "70° и 70°"], corr: "80° и 80°" },
+        { t: "Равносторонний", d: "Это частный случай равнобедренного, где ВСЕ стороны равны.", q: "Какой угол в равностороннем треугольнике?", opts: ["60°", "90°", "45°"], corr: "60°" },
+        { t: "Медианы боковых сторон", d: "Запомни: медианы, проведенные к БОКОВЫМ сторонам, тоже равны между собой.", opts: ["Понятно"], act: () => show(['mSideL', 'mSideR']) },
+        { t: "Биссектрисы оснований", d: "Биссектрисы углов при основании в равнобедренном треугольнике равны.", opts: ["Ок, идем дальше"], act: () => show(['mAngleA', 'mAngleC']) },
+        { t: "Симметрия", d: "Равнобедренный треугольник имеет ровно одну ось симметрии.", q: "Где она проходит?", opts: ["Через высоту к основанию", "Через основание", "Её нет"], corr: "Через высоту к основанию" },
+        { t: "Построение", d: "Чтобы построить такой треугольник, достаточно знать основание и высоту.", opts: ["Интересно"], act: () => show(['mCenter']) },
+        { t: "Почти у цели!", d: "Ты изучил все основные свойства. Готов к битве с Боссом?", opts: ["ДА, В БОЙ!"], act: () => { document.getElementById('boss-layer').style.display='flex'; updateLeaderboard(); } }
+    ];
+
+    let currentStep = 0;
+
+    function moveStep(dir) {
+        if (currentStep + dir >= 0 && currentStep + dir < steps.length) {
+            currentStep += dir;
+            renderStep();
+        }
+    }
+
+    function renderStep() {
+        const s = steps[currentStep];
+        document.getElementById('stepTitle').innerText = s.t;
+        document.getElementById('stepDesc').innerHTML = s.d;
+        document.getElementById('pFill').style.width = `${(currentStep / (steps.length - 1)) * 100}%`;
+        
+        const ctrl = document.getElementById('stepInput');
+        ctrl.innerHTML = '';
+        
+        // Сброс графики
+        hideAllMarkers();
+        if (s.act) s.act();
+
+        s.opts.forEach(o => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = o;
+            b.onclick = () => {
+                if (s.corr) {
+                    if (o === s.corr) { b.classList.add('correct'); setTimeout(() => moveStep(1), 600); }
+                    else { b.classList.add('wrong'); }
+                } else { moveStep(1); }
+            };
+            ctrl.appendChild(b);
+        });
+        document.getElementById('btnBack').disabled = currentStep === 0;
+    }
+
+    function show(ids) { ids.forEach(id => document.getElementById(id).style.opacity = 1); }
+    function hideAllMarkers() { 
+        ['mSideL','mSideR','mAngleA','mAngleC','mCenter','mSquare'].forEach(id => document.getElementById(id).style.opacity = 0); 
+    }
+
+    // --- ЛОГИКА БОССА ---
+    let bossScore = 0; let bossTime = 30; let bossActive = false; let bossInt; let bossGoal = '';
+
+    function startBoss() {
+        bossScore = 0; bossTime = 30; bossActive = true;
+        document.getElementById('bossStartUI').style.display = 'none';
+        document.getElementById('bossControls').style.display = 'grid';
+        document.getElementById('bossScore').innerText = `Счет: ${bossScore}`;
+        nextBossQ();
+        bossInt = setInterval(() => {
+            bossTime--;
+            document.getElementById('bossTimer').innerText = `Время: ${bossTime}`;
+            if (bossTime <= 0) endBoss();
+        }, 1000);
+    }
+
+    function nextBossQ() {
+        const types = ['bis', 'hei', 'med'];
+        bossGoal = types[Math.floor(Math.random()*3)];
+        const svg = document.getElementById('bossSvg');
+        const bW = 100 + Math.random()*200; const bH = 80 + Math.random()*120;
+        const cX = 200; const cY = 250; const tY = cY - bH;
+        const xA = cX - bW/2; const xC = cX + bW/2;
+
+        let markerHtml = '';
+        if (bossGoal === 'bis') {
+            markerHtml = `<path d="M${cX-10},${tY+25} A15,15 0 0 1 ${cX},${tY+25}" stroke="var(--bisector)" fill="none" stroke-width="3"/>
+                          <path d="M${cX},${tY+25} A15,15 0 0 1 ${cX+10},${tY+25}" stroke="var(--bisector)" fill="none" stroke-width="3"/>`;
+        } else if (bossGoal === 'hei') {
+            markerHtml = `<polyline points="${cX-15},${cY} ${cX-15},${cY-15} ${cX},${cY-15}" stroke="var(--height)" fill="none" stroke-width="3"/>`;
+        } else {
+            markerHtml = `<line x1="${(xA+cX)/2}" y1="${cY-10}" x2="${(xA+cX)/2+5}" y2="${cY+10}" stroke="var(--median)" stroke-width="3"/>
+                          <line x1="${(xC+cX)/2-5}" y1="${cY-10}" x2="${(xC+cX)/2}" y2="${cY+10}" stroke="var(--median)" stroke-width="3"/>`;
+        }
+
+        svg.innerHTML = `
+            <path d="M${cX},${tY} L${xA},${cY} L${xC},${cY} Z" fill="#3498db11" stroke="#2c3e50" stroke-width="3"/>
+            <line x1="${cX}" y1="${tY}" x2="${cX}" y2="${cY}" stroke="#7f8c8d" stroke-dasharray="5,5" stroke-width="2"/>
+            ${markerHtml}
+        `;
+    }
+
+    function checkBoss(ans) {
+        const box = document.getElementById('bossBox');
+        if (ans === bossGoal) {
+            bossScore += 10; box.style.borderColor = 'var(--success)';
+        } else {
+            bossTime = Math.max(0, bossTime - 3); box.style.borderColor = 'var(--danger)';
+        }
+        document.getElementById('bossScore').innerText = `Счет: ${bossScore}`;
+        setTimeout(() => { box.style.borderColor = 'transparent'; nextBossQ(); }, 200);
+    }
+
+    function endBoss() {
+        bossActive = false; clearInterval(bossInt);
+        saveScore(bossScore);
+        document.getElementById('bossStatus').innerText = "ИГРА ОКОНЧЕНА!";
+        document.getElementById('bossControls').style.display = 'none';
+        document.getElementById('bossStartUI').style.display = 'block';
+        updateLeaderboard();
+    }
+
+    function saveScore(s) {
+        let h = JSON.parse(localStorage.getItem('geoHighscores') || '[]');
+        h.push({s, d: new Date().toLocaleDateString('ru-RU')});
+        h.sort((a,b) => b.s - a.s);
+        localStorage.setItem('geoHighscores', JSON.stringify(h.slice(0,5)));
+    }
+
+    function updateLeaderboard() {
+        const h = JSON.parse(localStorage.getItem('geoHighscores') || '[]');
+        document.getElementById('leaderboardBody').innerHTML = h.map((x, i) => 
+            `<tr><td>${i+1}</td><td>${x.s}</td><td>${x.d}</td></tr>`).join('');
+    }
+
+    renderStep();
+</script>
 </body>
 </html>
-
-
