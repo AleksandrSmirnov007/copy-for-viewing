@@ -2,12 +2,266 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Сноски с CSS-счетчиком</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лаборатория равнобедренного треугольника</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #f0f3f5;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background: white;
+            width: 95%;
+            max-width: 1000px;
+            height: 600px;
+            border-radius: 20px;
+            display: flex;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        /* Левая часть - Интерактив */
+        .canvas-side {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-right: 2px solid #f0f0f0;
+        }
+
+        svg { width: 100%; height: 400px; }
+
+        /* Правая часть - Обучение */
+        .info-side {
+            width: 400px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            background: #fafbfc;
+        }
+
+        .step-tag {
+            color: var(--accent);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        h2 { margin: 0 0 20px 0; color: var(--primary); }
+        .description { font-size: 16px; line-height: 1.6; color: #555; margin-bottom: 20px; }
+
+        .interactive-controls {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        input[type="range"] { width: 100%; cursor: pointer; }
+
+        .btn-group { margin-top: auto; display: flex; gap: 10px; }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-next { background: var(--primary); color: white; flex: 2; }
+        .btn-prev { background: #eee; color: #777; flex: 1; }
+        button:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Геометрические стили */
+        .tri-path { fill: rgba(52, 152, 219, 0.1); stroke: var(--primary); stroke-width: 3; }
+        .side-label { font-size: 14px; font-weight: bold; fill: var(--primary); }
+        .angle-text { font-size: 12px; fill: var(--danger); font-weight: bold; }
+        .mark { stroke: var(--danger); stroke-width: 3; }
+        .bisector { stroke: var(--success); stroke-width: 2; stroke-dasharray: 5,5; }
+    </style>
 </head>
 <body>
 
+<div class="app-container">
+    <div class="canvas-side">
+        <svg id="scene" viewBox="0 0 400 400">
+            <!-- Треугольник -->
+            <path id="mainTri" class="tri-path" d="" />
+            
+            <!-- Высота/Медиана -->
+            <line id="hLine" class="bisector" x1="200" y1="50" x2="200" y2="350" style="display:none;"/>
+            
+            <!-- Штрихи равенства сторон -->
+            <g id="sideMarks" style="display:none;">
+                <line id="m1" class="mark" x1="" y1="" x2="" y2="" />
+                <line id="m2" class="mark" x1="" y1="" x2="" y2="" />
+            </g>
+
+            <!-- Текстовые метки -->
+            <text id="labelA" x="50" y="370" class="side-label">A</text>
+            <text id="labelB" x="190" y="40" class="side-label">B</text>
+            <text id="labelC" x="340" y="370" class="side-label">C</text>
+            
+            <!-- Значения углов -->
+            <text id="valA" x="70" y="340" class="angle-text"></text>
+            <text id="valC" x="310" y="340" class="angle-text"></text>
+        </svg>
+    </div>
+
+    <div class="info-side">
+        <div class="step-tag" id="stepNum">Урок 1</div>
+        <h2 id="title">Равные стороны</h2>
+        <div class="description" id="desc">
+            Подвигай ползунок, чтобы изменить длину боковых сторон. Заметь, что они всегда остаются равными друг другу.
+        </div>
+
+        <div class="interactive-controls" id="controls">
+            <label id="rangeLabel">Ширина основания: <b id="rangeVal">200</b></label>
+            <input type="range" id="mainSlider" min="50" max="350" value="200">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-prev" id="prevBtn" onclick="changeStep(-1)" disabled>Назад</button>
+            <button class="btn-next" id="nextBtn" onclick="changeStep(1)">Далее</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let step = 0;
+    const slider = document.getElementById('mainSlider');
+    const rangeLabel = document.getElementById('rangeLabel');
+    const rangeVal = document.getElementById('rangeVal');
+
+    const steps = [
+        {
+            title: "Боковые стороны",
+            desc: "В равнобедренном треугольнике стороны <b>AB</b> и <b>BC</b> всегда равны. Тяни за ползунок и убедись, что они меняются синхронно!",
+            label: "Ширина основания:",
+            min: 100, max: 350, val: 200,
+            showMarks: true, showAngles: false, showHeight: false
+        },
+        {
+            title: "Углы при основании",
+            desc: "Видишь значения углов? Как бы ты ни менял форму треугольника, угол <b>A</b> всегда равен углу <b>C</b>.",
+            label: "Высота треугольника:",
+            min: 50, max: 350, val: 200,
+            showMarks: false, showAngles: true, showHeight: false
+        },
+        {
+            title: "Магия высоты",
+            desc: "Высота, проведенная к основанию, делит его ровно пополам и является биссектрисой угла B. Нажми 'Далее', чтобы завершить.",
+            label: "Сдвиг вершины:",
+            min: 100, max: 300, val: 200,
+            showMarks: false, showAngles: false, showHeight: true
+        }
+    ];
+
+    function updateTriangle() {
+        const val = parseInt(slider.value);
+        const s = steps[step];
+        
+        let ax, ay, bx, by, cx, cy;
+        
+        if (step === 0) { // Ширина основания
+            ax = 200 - val/2; cx = 200 + val/2;
+            ay = cy = 350; bx = 200; by = 50;
+        } else if (step === 1) { // Высота
+            ax = 50; cx = 350; ay = cy = 350;
+            bx = 200; by = 400 - val;
+        } else { // Сдвиг (демонстрация что свойства теряются если не равнобедренный)
+            ax = 50; cx = 350; ay = cy = 350;
+            bx = val; by = 50;
+            // Включаем/выключаем подсказки в зависимости от того, по центру ли вершина
+            document.getElementById('hLine').style.stroke = (val === 200) ? 'var(--success)' : '#ccc';
+        }
+
+        // Рисуем путь
+        document.getElementById('mainTri').setAttribute('d', `M${bx},${by} L${ax},${ay} L${cx},${cy} Z`);
+        
+        // Углы (примерный расчет для визуала)
+        const angle = Math.atan2(ay - by, Math.abs(ax - bx)) * (180 / Math.PI);
+        if (s.showAngles) {
+            document.getElementById('valA').textContent = Math.round(angle) + '°';
+            document.getElementById('valC').textContent = Math.round(angle) + '°';
+            document.getElementById('valA').setAttribute('x', ax + 20);
+            document.getElementById('valC').setAttribute('x', cx - 50);
+        } else {
+            document.getElementById('valA').textContent = '';
+            document.getElementById('valC').textContent = '';
+        }
+
+        // Обновляем позиции букв
+        document.getElementById('labelA').setAttribute('x', ax - 20);
+        document.getElementById('labelC').setAttribute('x', cx + 10);
+        document.getElementById('labelB').setAttribute('x', bx - 5);
+        document.getElementById('labelB').setAttribute('y', by - 10);
+
+        // Обновляем высоту
+        if (s.showHeight) {
+            const h = document.getElementById('hLine');
+            h.setAttribute('x1', bx); h.setAttribute('y1', by);
+            h.setAttribute('x2', bx); h.setAttribute('y2', 350);
+        }
+
+        // Штрихи равенства
+        if (s.showMarks) {
+            const m1 = document.getElementById('m1');
+            const m2 = document.getElementById('m2');
+            m1.setAttribute('x1', (ax+bx)/2 - 5); m1.setAttribute('y1', (ay+by)/2 + 5);
+            m1.setAttribute('x2', (ax+bx)/2 + 5); m1.setAttribute('y2', (ay+by)/2 - 5);
+            m2.setAttribute('x1', (cx+bx)/2 - 5); m2.setAttribute('y1', (ay+by)/2 - 5);
+            m2.setAttribute('x2', (cx+bx)/2 + 5); m2.setAttribute('y2', (ay+by)/2 + 5);
+        }
+        
+        rangeVal.textContent = val;
+    }
+
+    function changeStep(dir) {
+        step += dir;
+        if (step >= steps.length) { alert("Вы изучили все свойства!"); step = 0; }
+        
+        const s = steps[step];
+        document.getElementById('stepNum').textContent = `Урок ${step + 1}`;
+        document.getElementById('title').textContent = s.title;
+        document.getElementById('desc').innerHTML = s.desc;
+        rangeLabel.innerHTML = `${s.label} <b id="rangeVal">${s.val}</b>`;
+        
+        slider.min = s.min;
+        slider.max = s.max;
+        slider.value = s.val;
+
+        document.getElementById('sideMarks').style.display = s.showMarks ? 'block' : 'none';
+        document.getElementById('hLine').style.display = s.showHeight ? 'block' : 'none';
+        
+        document.getElementById('prevBtn').disabled = (step === 0);
+        updateTriangle();
+    }
+
+    slider.oninput = updateTriangle;
+    updateTriangle(); // Init
+</script>
 </body>
 </html>
-
-

@@ -2,12 +2,134 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Сноски с CSS-счетчиком</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лаборатория: Линии треугольника</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bisector: #9b59b6;
+            --height: #e67e22;
+            --median: #27ae60;
+            --bg: #f4f7f6;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        .container { background: white; display: flex; width: 900px; height: 550px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        .canvas-area { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-right: 1px solid #eee; }
+        
+        .info-area { width: 350px; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+
+        svg { width: 100%; height: 350px; overflow: visible; }
+        
+        /* Стили линий */
+        .tri-shape { fill: #3498db11; stroke: var(--primary); stroke-width: 3; }
+        .main-line { stroke-width: 3; stroke-dasharray: 8,4; transition: 0.3s; opacity: 0; }
+        .angle-arc { fill: none; stroke-width: 2; opacity: 0; transition: 0.3s; }
+        .rect-mark { fill: none; stroke-width: 2; opacity: 0; transition: 0.3s; }
+        .segment-mark { stroke-width: 3; opacity: 0; transition: 0.3s; }
+
+        /* Кнопки */
+        .btn-panel { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .tool-btn { border: 2px solid #ddd; background: white; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; text-align: left; display: flex; align-items: center; }
+        .tool-btn:hover { background: #f9f9f9; border-color: var(--accent); }
+        .tool-btn.active { color: white; border-color: transparent; }
+        
+        .btn-bis { border-left: 8px solid var(--bisector); }
+        .btn-bis.active { background: var(--bisector); }
+        .btn-hei { border-left: 8px solid var(--height); }
+        .btn-hei.active { background: var(--height); }
+        .btn-med { border-left: 8px solid var(--median); }
+        .btn-med.active { background: var(--median); }
+
+        .desc-text { font-size: 0.95em; color: #555; line-height: 1.5; margin-bottom: 20px; }
+        .formula { background: #f0f0f0; padding: 5px 10px; border-radius: 5px; font-family: monospace; }
+    </style>
 </head>
 <body>
 
+<div class="container">
+    <div class="canvas-area">
+        <svg viewBox="0 0 400 350">
+            <!-- Основание и бока -->
+            <path class="tri-shape" d="M200,50 L50,300 L350,300 Z" />
+            
+            <!-- Центральная линия (Общая для всех) -->
+            <line id="theLine" class="main-line" x1="200" y1="50" x2="200" y2="300" stroke="#7f8c8d" />
+
+            <!-- Визуал для Биссектрисы (Дуги у вершины B) -->
+            <path id="arcL" class="angle-arc" d="M190,75 A15,15 0 0 1 200,75" stroke="var(--bisector)" />
+            <path id="arcR" class="angle-arc" d="M200,75 A15,15 0 0 1 210,75" stroke="var(--bisector)" />
+
+            <!-- Визуал для Высоты (Прямой угол внизу) -->
+            <polyline id="squareMark" class="rect-mark" points="185,300 185,285 200,285" stroke="var(--height)" />
+
+            <!-- Визуал для Медианы (Засечки на основании) -->
+            <line id="mMark1" class="segment-mark" x1="120" y1="290" x2="130" y2="310" stroke="var(--median)" />
+            <line id="mMark2" class="segment-mark" x1="270" y1="290" x2="280" y2="310" stroke="var(--median)" />
+
+            <!-- Буквы -->
+            <text x="195" y="40" font-weight="bold">B</text>
+            <text x="35" y="315" font-weight="bold">A</text>
+            <text x="355" y="315" font-weight="bold">C</text>
+            <text x="195" y="325" font-weight="bold" fill="#7f8c8d">H/M</text>
+        </svg>
+    </div>
+
+    <div class="info-area">
+        <h2>Линии в треугольнике</h2>
+        <p class="desc-text">В равнобедренном треугольнике линия, проведённая из вершины к основанию, обладает уникальным свойством: <b>она совмещает в себе три роли.</b></p>
+        
+        <div class="btn-panel">
+            <button class="tool-btn btn-bis" onclick="showFeature('bis')">Биссектриса 📐</button>
+            <button class="tool-btn btn-hei" onclick="showFeature('hei')">Высота 📍</button>
+            <button class="tool-btn btn-med" onclick="showFeature('med')">Медиана 📏</button>
+        </div>
+
+        <p id="explanation" style="margin-top:20px; font-style: italic; color: #666;"></p>
+    </div>
+</div>
+
+<script>
+    function showFeature(type) {
+        // Сброс всех кнопок
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        
+        // Сброс всех элементов SVG
+        const elements = ['theLine', 'arcL', 'arcR', 'squareMark', 'mMark1', 'mMark2'];
+        elements.forEach(el => document.getElementById(el).style.opacity = "0");
+        
+        const line = document.getElementById('theLine');
+        line.style.opacity = "1";
+        const exp = document.getElementById('explanation');
+
+        if (type === 'bis') {
+            document.querySelector('.btn-bis').classList.add('active');
+            line.style.stroke = "var(--bisector)";
+            document.getElementById('arcL').style.opacity = "1";
+            document.getElementById('arcR').style.opacity = "1";
+            exp.innerHTML = "<b>Биссектриса</b> делит угол ∠B пополам. Теперь левый угол равен правому.";
+        } 
+        else if (type === 'hei') {
+            document.querySelector('.btn-hei').classList.add('active');
+            line.style.stroke = "var(--height)";
+            document.getElementById('squareMark').style.opacity = "1";
+            exp.innerHTML = "<b>Высота</b> падает на основание под прямым углом (90°).";
+        } 
+        else if (type === 'med') {
+            document.querySelector('.btn-med').classList.add('active');
+            line.style.stroke = "var(--median)";
+            document.getElementById('mMark1').style.opacity = "1";
+            document.getElementById('mMark2').style.opacity = "1";
+            exp.innerHTML = "<b>Медиана</b> делит основание AC на два равных отрезка: AM = MC.";
+        }
+    }
+
+    // Показать первое свойство при загрузке
+    window.onload = () => showFeature('bis');
+</script>
+
 </body>
 </html>
-
-
