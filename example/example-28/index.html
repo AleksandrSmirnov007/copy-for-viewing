@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тренажер: Деление в столбик</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Деление в столбик</h1>
+        <div class="inputs">
+            <input type="number" id="dividend" placeholder="Делимое" value="425">
+            <span>÷</span>
+            <input type="number" id="divisor" placeholder="Делитель" value="25">
+            <button onclick="startDivision()">Решить</button>
+        </div>
+        <div id="board" class="board"></div>
+        <div id="step-hint" class="hint">Введите числа и нажмите кнопку</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
